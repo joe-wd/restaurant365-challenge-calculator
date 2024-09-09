@@ -56,6 +56,10 @@ class Program
             Console.WriteLine(e.Message);
             Console.WriteLine($"Negative operands found: {string.Join(',', e.NegativeValues)}");
         }
+        catch (InvalidExpressionCalculatorException e)
+        {
+            Console.WriteLine($"{e.Message}: {e.Expression}");
+        }
         catch (Exception e) 
         {
             Console.WriteLine(e.Message);

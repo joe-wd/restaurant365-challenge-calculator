@@ -49,6 +49,10 @@ namespace Calculator.Tests
         [InlineData("2,1001,6", 8)]
         [InlineData(",,\n,,9999,,\n,,", 0)]
 
+        // Requirement 6
+        [InlineData(@"//#\n2#5", 7)]
+        [InlineData(@"//,\n2,ff,100", 102)]
+        [InlineData(@"//x\n1,2,3,,,x94x,", 100)]
         public void CalcTest(string expression, decimal expectedResult)
         {
             decimal result = _calculator.Calculate(expression);
@@ -67,6 +71,21 @@ namespace Calculator.Tests
         public void NegativeOperandsTest(string expression)
         {
             Assert.Throws<NegativeValuesCalculatorException>(
+                () => _calculator.Calculate((expression))
+            );
+        }
+
+        [Theory]
+        // Requirement 6
+        // Console input is not escaped, so test strings should behave the same way.
+        // In this case, the @"\t" is two characters, not a tab char, so cannot be used.
+        // Delimiters must be one character
+        [InlineData(@"//\t\n5\t5,,5,")]
+        [InlineData(@"//**\n1,2,3")]
+        [InlineData(@"//xyzzy\n1,2,3")]
+        public void InvalidExpressionTest(string expression)
+        {
+            Assert.Throws<InvalidExpressionCalculatorException>(
                 () => _calculator.Calculate((expression))
             );
         }

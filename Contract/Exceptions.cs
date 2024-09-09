@@ -24,3 +24,10 @@ public class NegativeValuesCalculatorException(decimal[] negativeValues) : Calcu
 
     public decimal[] NegativeValues { get; private set; } = negativeValues;
 }
+
+public class InvalidExpressionCalculatorException(string expression) : CalculatorException(_message)
+{
+    static readonly string _message = "Invalid calculator expression";
+
+    public string Expression { get; private set; } = expression;
+}

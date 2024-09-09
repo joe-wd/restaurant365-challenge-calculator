@@ -1,4 +1,5 @@
 using System.Data;
+using System.Text.RegularExpressions;
 using Contract;
 
 namespace Calculator;
@@ -15,6 +16,9 @@ public class SumCalculator : ICalculator
     ];
 
     protected readonly decimal _maxValue = 1000;
+    protected const string _customDelimiterPrefix = @"//";
+    protected const string _customDelimiterPattern = @"^//(.)\\n(.*)$";
+
 
     public List<CalculatorOperator> SupportedOperators => [CalculatorOperator.Add];
 
@@ -52,8 +56,11 @@ public class SumCalculator : ICalculator
         {
             return 0;
         }
-        var operands = expression
-            .Split(_delimiters, StringSplitOptions.None)
+
+        // parse the input to get any custom delimiters and the expression to calculate
+        var parseResult = ParseExpression(expression);
+        var operands = parseResult.expression
+            .Split(parseResult.delimiters, StringSplitOptions.None)
             .Select(o => EvalOperand(o));
 
         var negativeOperands = operands.Where(o => o < 0);
@@ -76,5 +83,49 @@ public class SumCalculator : ICalculator
     protected virtual decimal EvalOperand(string operand)
     {
         return Decimal.TryParse(operand, out decimal val) && val <= _maxValue ? val : 0;
+    }
+
+    protected (string[] delimiters, string expression) ParseExpression(string expression)
+    {
+        // Any custom delimiter?
+        if (!expression.StartsWith(_customDelimiterPrefix))
+        {
+            // No, just use the standard delimiters and return the whole expression provided
+            return (_delimiters, expression);
+        }
+        else
+        {
+            // Expecting custom delimiter
+            var matches = Regex.Matches(
+                    expression,
+                    _customDelimiterPattern,
+                    RegexOptions.None,
+                    TimeSpan.FromSeconds(5));
+
+            // Regex must have at least 1 match with 3 groups: 
+            // 1) the whole input, 
+            // 2) the delimiters, 
+            // 3) the expression
+            if (matches.Count != 1 || matches.First().Groups.Count < 3)
+            {
+                throw new InvalidExpressionCalculatorException(expression);
+            }
+            else
+            {
+                // Extract the delimiters from group 1
+                var match = matches.First();
+                List<string> delimiters = matches
+                    .First()
+                    .Groups[1]
+                    .Captures
+                    .Select(c => c.Value)
+                    .ToList<string>();
+
+                var remainingExpression = matches.First().Groups[2].Captures[0].Value;
+
+                // Include the standard delimiters in the return value; they still apply
+                return (delimiters.Concat(_delimiters).ToArray(), remainingExpression);
+            }
+        }
     }
 }
