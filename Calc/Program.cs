@@ -51,6 +51,11 @@ class Program
             Console.WriteLine(e.Message);
             Console.WriteLine($"Maximum allowed: {e.MaxOperands}");
         }
+        catch (NegativeValuesCalculatorException e)
+        {
+            Console.WriteLine(e.Message);
+            Console.WriteLine($"Negative operands found: {string.Join(',', e.NegativeValues)}");
+        }
         catch (Exception e) 
         {
             Console.WriteLine(e.Message);

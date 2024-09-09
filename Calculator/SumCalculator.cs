@@ -35,6 +35,7 @@ public class SumCalculator : ICalculator
 
     /// <summary>
     /// Calculates the sum of the expression
+    /// Negative numbers disallowed
     /// </summary>
     /// <param name="expression">Expression to calculate</param>
     /// <returns>The sum</returns>
@@ -45,10 +46,19 @@ public class SumCalculator : ICalculator
         {
             return 0;
         }
-        return expression
+        var operands = expression
             .Split(_delimiters, StringSplitOptions.None)
-            .Select(o => EvalOperand(o))
-            .Sum();
+            .Select(o => EvalOperand(o));
+
+        var negativeOperands = operands.Where(o => o < 0);
+        if (negativeOperands.Any())
+        {
+            throw new NegativeValuesCalculatorException(negativeOperands.ToArray());
+        }
+        else
+        {
+            return operands.Sum();
+        }
     }
 
     /// <summary>

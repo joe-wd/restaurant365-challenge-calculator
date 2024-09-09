@@ -18,3 +18,9 @@ public class TooManyOperandsCalculatorException(int maxOperands) : CalculatorExc
     public int MaxOperands { get; private set; } = maxOperands;
 }
 
+public class NegativeValuesCalculatorException(decimal[] negativeValues) : CalculatorException(_message)
+{
+    static readonly string _message = "Expression cannot contain negative operands";
+
+    public decimal[] NegativeValues { get; private set; } = negativeValues;
+}
