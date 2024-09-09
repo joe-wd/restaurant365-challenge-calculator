@@ -18,6 +18,7 @@ public class SumCalculator : ICalculator
     protected readonly decimal _maxValue = 1000;
     protected const string _customDelimiterPrefix = @"//";
     protected const string _customDelimiterPattern = @"^//(.)\\n(.*)$";
+    protected const string _customDelimiterPattern2 = @"^//\[(.+?)\]\\n(.*)$";
 
 
     public List<CalculatorOperator> SupportedOperators => [CalculatorOperator.Add];
@@ -85,6 +86,12 @@ public class SumCalculator : ICalculator
         return Decimal.TryParse(operand, out decimal val) && val <= _maxValue ? val : 0;
     }
 
+    /// <summary>
+    /// Parses the provided expression to determine whether there are any custom delimiters
+    /// </summary>
+    /// <param name="expression">expression possibly with custom delimiters</param>
+    /// <returns>A tuple with the delimiters and expression to compute</returns>
+    /// <exception cref="InvalidExpressionCalculatorException"></exception>
     protected (string[] delimiters, string expression) ParseExpression(string expression)
     {
         // Any custom delimiter?
@@ -93,39 +100,49 @@ public class SumCalculator : ICalculator
             // No, just use the standard delimiters and return the whole expression provided
             return (_delimiters, expression);
         }
-        else
+        else if (Regex.IsMatch(expression, _customDelimiterPattern, RegexOptions.None, TimeSpan.FromSeconds(5)))
         {
-            // Expecting custom delimiter
-            var matches = Regex.Matches(
-                    expression,
-                    _customDelimiterPattern,
-                    RegexOptions.None,
-                    TimeSpan.FromSeconds(5));
-
-            // Regex must have at least 1 match with 3 groups: 
-            // 1) the whole input, 
-            // 2) the delimiters, 
-            // 3) the expression
-            if (matches.Count != 1 || matches.First().Groups.Count < 3)
-            {
-                throw new InvalidExpressionCalculatorException(expression);
-            }
-            else
-            {
-                // Extract the delimiters from group 1
-                var match = matches.First();
-                List<string> delimiters = matches
-                    .First()
-                    .Groups[1]
-                    .Captures
-                    .Select(c => c.Value)
-                    .ToList<string>();
-
-                var remainingExpression = matches.First().Groups[2].Captures[0].Value;
-
-                // Include the standard delimiters in the return value; they still apply
-                return (delimiters.Concat(_delimiters).ToArray(), remainingExpression);
-            }
+            // Expecting one single-char custom delimiter
+            return ParseMatch(expression, _customDelimiterPattern);
         }
+        else if (Regex.IsMatch(expression, _customDelimiterPattern2, RegexOptions.None, TimeSpan.FromSeconds(5)))
+        {
+            // Expecting one custom delimiter any length, in square brackets
+            return ParseMatch(expression, _customDelimiterPattern2);
+        }
+
+        throw new InvalidExpressionCalculatorException(expression);
+    }
+
+    private (string[] delimiters, string expression) ParseMatch(string expression, string pattern)
+    {
+        var matches = Regex.Matches(
+                expression,
+                pattern,
+                RegexOptions.None,
+                TimeSpan.FromSeconds(5));
+
+        // Regex must have at least 1 match with 3 groups: 
+        // 1) the whole input, 
+        // 2) the delimiters, 
+        // 3) the expression
+        if (matches.Count == 1 && matches.First().Groups.Count == 3)
+        {
+            var match = matches.First();
+            // Extract the delimiters from group 1
+            List<string> delimiters = matches
+                .First()
+                .Groups[1]
+                .Captures
+                .Select(c => c.Value)
+                .ToList<string>();
+
+            var remainingExpression = matches.First().Groups[2].Captures[0].Value;
+
+            // Include the standard delimiters in the return value; they still apply
+            return (delimiters.Concat(_delimiters).ToArray(), remainingExpression);
+        }
+
+        throw new InvalidExpressionCalculatorException(expression);
     }
 }
