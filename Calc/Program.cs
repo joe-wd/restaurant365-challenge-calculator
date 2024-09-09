@@ -10,7 +10,7 @@ class Program
     {
         try
         {
-            ICalculator calculator = new SumCalculator();
+            ICalculator2 calculator = new SumCalculator();
             List<CalculatorOperator> supportedOperators = calculator.SupportedOperators;
             List<string> supportedOperatorNames = supportedOperators.Select(s => s.ToString()).ToList();
 
@@ -38,7 +38,8 @@ class Program
                     }
                 }
 
-                Console.WriteLine(calculator.Calculate(expression, calculatorOperator));
+                var result = calculator.CalculateWithFormula(expression, calculatorOperator);
+                Console.WriteLine($"{result.formula} = {result.result}");
             }
         }
         catch (UnsupportedOperatorCalculatorException e)

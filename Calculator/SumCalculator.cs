@@ -7,7 +7,7 @@ namespace Calculator;
 /// <summary>
 /// ICalculator implementation that sums operands separated by "," or "\n"
 /// </summary>
-public class SumCalculator : ICalculator
+public class SumCalculator : ICalculator2
 {
     protected readonly string[] _delimiters =
     [
@@ -19,8 +19,7 @@ public class SumCalculator : ICalculator
     protected const string _customDelimiterPrefix = @"//";
     protected const string _customDelimiterPattern = @"^//(.)\\n(.*)$";
     protected const string _customDelimiterPattern2 = @"^//(?:\[(.+?)\])+?\\n(.*)$";
-
-
+    protected const string _operatorSymbol = @"+";
     public List<CalculatorOperator> SupportedOperators => [CalculatorOperator.Add];
 
     /// <summary>
@@ -43,6 +42,31 @@ public class SumCalculator : ICalculator
     }
 
     /// <summary>
+    /// Calculates the result of the expression based on the calculator rules,
+    /// and returns a Tuple with the result and the formula used
+    /// </summary>
+    /// <param name="expression">The expression to calculate</param>
+    /// <param name="op">The operator to apply</param>
+    /// <returns>Tuple with the calculated result of the expression and the formula</returns>
+    public (decimal result, string formula) CalculateWithFormula(
+        string expression, 
+        CalculatorOperator op = CalculatorOperator.Add)
+    {
+        switch (op)
+        {
+            case CalculatorOperator.Add:
+                return CalculateSumWithFormula(expression);
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    protected virtual decimal CalculateSum(string expression)
+    {
+        return CalculateSumWithFormula(expression).result;
+    }
+
+    /// <summary>
     /// Calculates the sum of the expression
     /// Negative numbers disallowed
     /// Non-numeric/missing/empty values are treated as 0.
@@ -51,11 +75,11 @@ public class SumCalculator : ICalculator
     /// <param name="expression">Expression to calculate</param>
     /// <returns>The sum</returns>
     /// <exception cref="TooManyOperandsCalculatorException"></exception>
-    protected virtual decimal CalculateSum(string expression)
+    protected virtual (decimal result, string formula) CalculateSumWithFormula(string expression)
     {
         if (string.IsNullOrWhiteSpace(expression))
         {
-            return 0;
+            return (0, "");
         }
 
         // parse the input to get any custom delimiters and the expression to calculate
@@ -71,7 +95,8 @@ public class SumCalculator : ICalculator
         }
         else
         {
-            return operands.Sum();
+            var formula = string.Join(_operatorSymbol, operands);
+            return (operands.Sum(), formula);
         }
     }
 
