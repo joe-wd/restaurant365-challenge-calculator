@@ -18,7 +18,7 @@ public class SumCalculator : ICalculator
     protected readonly decimal _maxValue = 1000;
     protected const string _customDelimiterPrefix = @"//";
     protected const string _customDelimiterPattern = @"^//(.)\\n(.*)$";
-    protected const string _customDelimiterPattern2 = @"^//\[(.+?)\]\\n(.*)$";
+    protected const string _customDelimiterPattern2 = @"^//(?:\[(.+?)\])+?\\n(.*)$";
 
 
     public List<CalculatorOperator> SupportedOperators => [CalculatorOperator.Add];
@@ -107,7 +107,7 @@ public class SumCalculator : ICalculator
         }
         else if (Regex.IsMatch(expression, _customDelimiterPattern2, RegexOptions.None, TimeSpan.FromSeconds(5)))
         {
-            // Expecting one custom delimiter any length, in square brackets
+            // Expecting one or more custom delimiters of any length, each in square brackets
             return ParseMatch(expression, _customDelimiterPattern2);
         }
 

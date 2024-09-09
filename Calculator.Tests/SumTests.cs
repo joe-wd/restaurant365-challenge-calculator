@@ -58,6 +58,9 @@ namespace Calculator.Tests
         [InlineData(@"//[***]\n11***22***33", 66)]
         [InlineData(@"//[#]\n5#10#15,20", 50)]
 
+        // Requirement 8
+        [InlineData(@"//[*][!!][r9r]\n11r9r22*hh*33!!44", 110)]
+
         public void CalcTest(string expression, decimal expectedResult)
         {
             decimal result = _calculator.Calculate(expression);
