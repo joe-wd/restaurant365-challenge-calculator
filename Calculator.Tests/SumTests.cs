@@ -27,7 +27,6 @@ namespace Calculator.Tests
         [InlineData(@"0.333333333", 0.333333333)]
         [InlineData(@"0.333333333,0.666666666", 0.999999999)]
         [InlineData(@"20", 20)]
-        [InlineData(@"1,5000", 5001)]
         [InlineData(@"5,tytyt", 5)]
 
         // Requirement 2
@@ -44,6 +43,11 @@ namespace Calculator.Tests
         [InlineData(@"1\n2,3", 6)]
         [InlineData(@"1\n2.2\n\nabc\n", 3.2)]
         [InlineData(@"1.1\n2.2\n3.3,4.4,,,", 11)]
+
+        // Requirement 5
+        [InlineData("1,5000", 1)]
+        [InlineData("2,1001,6", 8)]
+        [InlineData(",,\n,,9999,,\n,,", 0)]
 
         public void CalcTest(string expression, decimal expectedResult)
         {

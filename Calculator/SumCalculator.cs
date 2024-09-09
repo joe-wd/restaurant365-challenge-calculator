@@ -14,11 +14,15 @@ public class SumCalculator : ICalculator
         @"\n"
     ];
 
+    protected readonly decimal _maxValue = 1000;
+
     public List<CalculatorOperator> SupportedOperators => [CalculatorOperator.Add];
 
     /// <summary>
     /// Calculates the sum of values separated by "," or "\n"
+    /// Negative numbers disallowed
     /// Non-numeric/missing/empty values are treated as 0.
+    /// Numbers greater than 1000 are treated as 0.
     /// </summary>
     /// <param name="expression">Values separated by "," or "\n"</param>
     /// <returns>The sum of the values in the expression</returns>
@@ -36,6 +40,8 @@ public class SumCalculator : ICalculator
     /// <summary>
     /// Calculates the sum of the expression
     /// Negative numbers disallowed
+    /// Non-numeric/missing/empty values are treated as 0.
+    /// Numbers greater than 1000 are treated as 0.
     /// </summary>
     /// <param name="expression">Expression to calculate</param>
     /// <returns>The sum</returns>
@@ -63,11 +69,12 @@ public class SumCalculator : ICalculator
 
     /// <summary>
     /// Converts the provided string to a decimal value.
+    /// Any values over _maxValue (1000) are treated as 0.
     /// </summary>
     /// <param name="operand">String operand</param>
     /// <returns>Decimal value of the provided string operand, or 0 if not a valid decimal number</returns>
     protected virtual decimal EvalOperand(string operand)
     {
-        return Decimal.TryParse(operand, out decimal val) ? val : 0;
+        return Decimal.TryParse(operand, out decimal val) && val <= _maxValue ? val : 0;
     }
 }

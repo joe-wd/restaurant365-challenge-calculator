@@ -31,4 +31,14 @@ public class SumTwoOperandsCalculator : SumCalculator
         var numericOperands = operands.Select(o => EvalOperand(o));
         return numericOperands.Sum();
     }
+
+    /// <summary>
+    /// Converts the provided string to a decimal value.
+    /// </summary>
+    /// <param name="operand">String operand</param>
+    /// <returns>Decimal value of the provided string operand, or 0 if not a valid decimal number</returns>
+    override protected decimal EvalOperand(string operand)
+    {
+        return Decimal.TryParse(operand, out decimal val) ? val : 0;
+    }
 }
