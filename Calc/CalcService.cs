@@ -1,15 +1,27 @@
+using System.Text;
 using Contract;
 
 public class CalcService(ICalculator2 calculator) 
 {
     public void Run()
     {
+        // Build the prompt for operator selection
+        List<CalculatorOperator> supportedOperators = calculator.SupportedOperators;
+        List<string> supportedOperatorNames = supportedOperators.Select(s => s.ToString()).ToList();
+        StringBuilder sb = new();
+        for (int i = 0; i < supportedOperatorNames.Count; i++)
+        {
+            sb.AppendFormat($"{i}={supportedOperatorNames[i]}");
+            if (i < supportedOperatorNames.Count - 1)
+            {
+                sb.Append(", ");
+            }
+        }
+
         while (true)
         {
             try
             {
-                List<CalculatorOperator> supportedOperators = calculator.SupportedOperators;
-                List<string> supportedOperatorNames = supportedOperators.Select(s => s.ToString()).ToList();
 
                 // Expression user input
                 Console.Write("Enter expression: ");
@@ -23,15 +35,26 @@ public class CalcService(ICalculator2 calculator)
                     expression = expression.Trim();
 
                     // Operator user input if needed
-                    CalculatorOperator calculatorOperator = supportedOperators.First();
-                    if (supportedOperators.Count > 1)
+                    CalculatorOperator calculatorOperator;
+                    if (supportedOperators.Count == 1)
+                    {
+                        calculatorOperator = supportedOperators.First();
+                    }
+                    else
                     {
                         // Nice to have: accept operator symbol instead of name
-                        Console.Write($"Enter operator ({string.Join(", ", supportedOperatorNames)}): ");
-                        string? selectedOperator = Console.ReadLine();
-                        if (!Enum.TryParse(selectedOperator, out calculatorOperator))
+                        Console.Write($"Enter operator ({sb.ToString()}): ");
+                        string selectedOperator = Console.ReadLine() ?? "";
+                        int selectedOperatorVal;
+                        
+                        if (int.TryParse(selectedOperator, out selectedOperatorVal) && 
+                            Enum.IsDefined(typeof(CalculatorOperator), selectedOperatorVal))
                         {
-                            throw new UnsupportedOperatorCalculatorException(selectedOperator ?? "");
+                            calculatorOperator = (CalculatorOperator) (int.Parse(selectedOperator));
+                        }
+                        else
+                        {
+                            throw new UnsupportedOperatorCalculatorException(selectedOperator);
                         }
                     }
 

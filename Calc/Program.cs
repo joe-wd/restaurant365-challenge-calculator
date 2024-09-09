@@ -4,7 +4,7 @@ using Calculator;
 
 var services = new ServiceCollection();
 services.AddSingleton<ICalculator2>(
-    implementationFactory: static _ => new Calculator.SumCalculator()
+    implementationFactory: static _ => new Calculator.Calculator()
 );
 
 services.AddSingleton<CalcService>();
