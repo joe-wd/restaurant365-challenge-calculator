@@ -10,7 +10,7 @@ class Program
     {
         try
         {
-            ICalculator calculator = new SumTwoOperandsCalculator();
+            ICalculator calculator = new SumCalculator();
             List<CalculatorOperator> supportedOperators = calculator.SupportedOperators;
             List<string> supportedOperatorNames = supportedOperators.Select(s => s.ToString()).ToList();
 
