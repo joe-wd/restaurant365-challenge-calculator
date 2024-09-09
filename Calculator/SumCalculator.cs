@@ -4,19 +4,23 @@ using Contract;
 namespace Calculator;
 
 /// <summary>
-/// ICalculator implementation that sums comma-separated operands
+/// ICalculator implementation that sums operands separated by "," or "\n"
 /// </summary>
 public class SumCalculator : ICalculator
 {
-    protected const string _delimiter = @",";
+    protected readonly string[] _delimiters =
+    [
+        @",",
+        @"\n"
+    ];
 
     public List<CalculatorOperator> SupportedOperators => [CalculatorOperator.Add];
 
     /// <summary>
-    /// Calculates the sum of comma-separated values.
+    /// Calculates the sum of values separated by "," or "\n"
     /// Non-numeric/missing/empty values are treated as 0.
     /// </summary>
-    /// <param name="expression">Comma-separated values</param>
+    /// <param name="expression">Values separated by "," or "\n"</param>
     /// <returns>The sum of the values in the expression</returns>
     public virtual decimal Calculate(string expression, CalculatorOperator op = CalculatorOperator.Add)
     {
@@ -41,9 +45,10 @@ public class SumCalculator : ICalculator
         {
             return 0;
         }
-        var operands = expression.Split(_delimiter);
-        var numericOperands = operands.Select(o => EvalOperand(o));
-        return numericOperands.Sum();
+        return expression
+            .Split(_delimiters, StringSplitOptions.None)
+            .Select(o => EvalOperand(o))
+            .Sum();
     }
 
     /// <summary>

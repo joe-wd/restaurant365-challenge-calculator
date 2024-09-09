@@ -8,6 +8,8 @@ namespace Calculator;
 /// </summary>
 public class SumTwoOperandsCalculator : SumCalculator
 {
+    private const string _delimiter = @",";
+
     private const int _maxOperands = 2;
 
     /// <summary>

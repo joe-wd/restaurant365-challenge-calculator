@@ -45,6 +45,11 @@ namespace Calculator.Tests
         [InlineData(@"-1,2.5,1", 2.5)]
         [InlineData(@"1,2,3,4,5,6,7,8,9,10,11,12", 78)]
 
+        // Requirement 3
+        [InlineData(@"1\n2,3", 6)]
+        [InlineData(@"1\n2.2\n\nabc\n", 3.2)]
+        [InlineData(@"1.1\n2.2\n3.3,4.4,,,", 11)]
+        
         public void CalcTest(string expression, decimal expectedResult)
         {
             decimal result = _calculator.Calculate(expression);
