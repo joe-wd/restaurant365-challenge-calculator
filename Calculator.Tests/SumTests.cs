@@ -94,7 +94,7 @@ namespace Calculator.Tests
         public void InvalidExpressionTest(string expression)
         {
             Assert.Throws<InvalidExpressionCalculatorException>(
-                () => _calculator.Calculate((expression))
+                () => _calculator.Calculate(expression)
             );
         }
     }

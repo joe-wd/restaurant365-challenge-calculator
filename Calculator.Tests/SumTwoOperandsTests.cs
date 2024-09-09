@@ -57,7 +57,7 @@ namespace Calculator.Tests
         public void TooManyOperandsTest(string expression)
         {
             Assert.Throws<TooManyOperandsCalculatorException>(
-                () => _calculator.Calculate((expression))
+                () => _calculator.Calculate(expression)
             );
         }
     }
